@@ -38,7 +38,7 @@ footer{text-align:center;color:#8a9682;font-size:10px;padding:4px}
 <body>
 <main class="app">
 <header><div><div class="eyebrow">DEINE KLEINE WIESENWELT</div><h1>Schaf & Schnitt 🐑</h1></div><div class="wallet">🪙 <span id="coins">125</span></div></header>
-<nav class="tabs" aria-label="Spielbereiche"><button class="active" data-tab="meadow">🌿 Wiese</button><button data-tab="quests">🏆 Quests</button><button data-tab="shop">🧰 Werkstatt</button></nav>
+<nav class="tabs" aria-label="Spielbereiche"><button class="active" data-tab="meadow">🌿 Wiese</button><button data-tab="quests">🏆 Quests</button><button data-tab="shop">🧰 Shop</button><button data-tab="extras">🎒 Extras</button></nav>
 <section id="meadow">
 <div class="card">
 <div class="row"><span class="label">DEINE WIESE</span><b id="percent" style="font-size:12px">0% gemäht</b></div>
@@ -56,6 +56,7 @@ footer{text-align:center;color:#8a9682;font-size:10px;padding:4px}
 <section id="quests" hidden>
 <div class="card"><div class="paneltitle">Deine Quests 🏆</div><div class="sub">Jede gemähte Bahn bringt Flocke näher ans Ziel.</div><div id="questList"></div></div>
 </section>
+<section id="extras" hidden><div class="card"><div class="paneltitle">Flockes Garderobe 🎩</div><div class="sub">Sammle Outfits für dein Schäfchen.</div><div id="cosmetics"></div></div><div class="card"><div class="paneltitle">Erfolge ⭐</div><div id="achievements"></div></div></section>
 <section id="shop" hidden>
 <div class="card"><div class="paneltitle">Flockes Werkstatt 🧰</div><div class="sub">Investiere deine Mäh-Münzen in bessere Ausrüstung.</div><div id="shopList"></div></div>
 </section>
@@ -63,28 +64,33 @@ footer{text-align:center;color:#8a9682;font-size:10px;padding:4px}
 </main>
 <script>
 (()=>{
-const defaults={coins:125,grass:0,mower:1,speed:1,basket:1,earned:0,claimed:[false,false,false]};
+const defaults={coins:125,grass:0,mower:1,speed:1,basket:1,magnet:1,earned:0,totalGrass:0,xp:0,claimed:[false,false,false,false,false],owned:['🐑'],sheep:'🐑'};
 let s;try{s={...defaults,...JSON.parse(localStorage.getItem('sheep-cut-save')||'{}')}}catch{s={...defaults}}
 let running=false,tick=null,step=0;
 const $=id=>document.getElementById(id);
-const quests=[{icon:'🌼',name:'Erste Bahnen',desc:'Mähe 20 % der Wiese',goal:20,reward:45,progress:()=>s.grass},{icon:'🐑',name:'Fleißiges Schäfchen',desc:'Mähe 50 % der Wiese',goal:50,reward:90,progress:()=>s.grass},{icon:'🪙',name:'Münzsammler',desc:'Verdiene 100 Münzen',goal:100,reward:60,progress:()=>s.earned}];
-const upgrades=[{key:'mower',icon:'⚙️',name:'Turbo-Messer',desc:'Mehr Gras pro Mährunde',base:80},{key:'speed',icon:'💨',name:'Flitz-Reifen',desc:'Flocke fährt flotter umher',base:65},{key:'basket',icon:'🧺',name:'Großer Fangkorb',desc:'Mehr Platz für deine Ernte',base:55}];
+const quests=[{icon:'🌼',name:'Erste Bahnen',desc:'Mähe 20 % der Wiese',goal:20,reward:45,progress:()=>s.grass},{icon:'🐑',name:'Fleißiges Schäfchen',desc:'Mähe insgesamt 100 % Gras',goal:100,reward:90,progress:()=>s.totalGrass},{icon:'🪙',name:'Münzsammler',desc:'Verdiene 100 Münzen',goal:100,reward:60,progress:()=>s.earned},{icon:'⚙️',name:'Tüftler',desc:'Kaufe 3 Upgrade-Level',goal:3,reward:100,progress:()=>s.mower+s.speed+s.basket+s.magnet-4},{icon:'🌳',name:'Wiesenmeister',desc:'Mähe insgesamt 500 % Gras',goal:500,reward:180,progress:()=>s.totalGrass}];
+const upgrades=[{key:'mower',icon:'⚙️',name:'Titan-Mähmesser',desc:'Mäht +2 Gras je Schnitt und Level',base:80},{key:'speed',icon:'💨',name:'Turbo-Motor',desc:'Verkürzt die Zeit zwischen den Schnitten',base:95},{key:'magnet',icon:'🧲',name:'Münzmagnet',desc:'Erhöht Münzen pro Schnitt um 25 % je Level',base:110},{key:'basket',icon:'🧺',name:'Profi-Fangkorb',desc:'Gibt bei jeder fertigen Wiese einen Bonus von 30 Münzen je Level',base:75}];
+const outfits=[{emoji:'🐑',name:'Flocke',cost:0},{emoji:'🐏',name:'Bruno',cost:180},{emoji:'🐑🎩',name:'Flocke mit Zylinder',cost:260},{emoji:'🐑🕶️',name:'Cooles Schaf',cost:320}];
 function save(){localStorage.setItem('sheep-cut-save',JSON.stringify(s))}
 function render(){
 $('coins').textContent=s.coins;$('percent').textContent=s.grass+'% gemäht';$('mowed').textContent=s.grass+'%';$('mowerLevel').textContent=s.mower;$('speedLevel').textContent=s.speed;$('remaining').textContent=(100-s.grass)+'% übrig';$('bar').style.width=s.grass+'%';$('patch').style.clipPath=`inset(0 ${100-s.grass}% 0 0)`;
+$('cosmetics').innerHTML=outfits.map(o=>`<div class="upgrade"><div class="emoji">${o.emoji}</div><div class="grow"><b>${o.name}</b><div class="sub">${s.owned.includes(o.emoji)?'Freigeschaltet':'Neues Outfit für Flocke'}</div></div><button class="action" data-outfit="${o.emoji}" ${s.sheep===o.emoji?'disabled':''}>${s.owned.includes(o.emoji)?'Anziehen':'🪙 '+o.cost}</button></div>`).join('');
+$('achievements').innerHTML=[['🌱','Erster Schnitt',s.totalGrass>0],['🪙','Erste Münzen',s.earned>0],['🏆','Wiesenmeister',s.totalGrass>=500],['🛠️','Tüftler',s.mower+s.speed+s.basket+s.magnet>=7]].map(a=>`<div class="quest"><div class="emoji">${a[0]}</div><div class="grow"><b>${a[1]}</b><div class="sub">${a[2]?'Freigeschaltet':'Noch offen'}</div></div></div>`).join('');
 $('questList').innerHTML=quests.map((q,i)=>{let p=Math.min(q.progress(),q.goal),done=p>=q.goal;return `<div class="quest"><div class="emoji">${q.icon}</div><div class="grow"><b>${q.name}</b><div class="sub">${q.desc}</div><div class="tinybar"><span style="width:${p/q.goal*100}%"></span></div><div class="sub">${p} / ${q.goal}</div></div><div style="text-align:right"><div class="reward">+${q.reward} 🪙</div><button class="action" data-claim="${i}" ${!done||s.claimed[i]?'disabled':''}>${s.claimed[i]?'Erledigt ✓':'Abholen'}</button></div></div>`}).join('');
 $('shopList').innerHTML=upgrades.map(u=>{let level=s[u.key],cost=u.base*level;return `<div class="upgrade"><div class="emoji">${u.icon}</div><div class="grow"><b>${u.name}</b><div class="sub">${u.desc}</div><div class="sub">Level ${level}</div></div><button class="action" data-buy="${u.key}" ${s.coins<cost?'disabled':''}>🪙 ${cost}</button></div>`}).join('');
 $('mowBtn').textContent=running?'Ⅱ Pause machen':(s.grass>=100?'↻ Neue Wiese':'▶ Los geht’s, Flocke!');$('status').textContent=running?'FLOCKE MÄHT FLEISSIG':(s.grass>=100?'WIESE PERFEKT!':'FLOCKE IST BEREIT');
 save();
 }
 function stop(){running=false;clearInterval(tick);tick=null;render()}
-function start(){if(s.grass>=100){s.grass=0;step=0}running=true;render();tick=setInterval(()=>{let cut=Math.min(1+s.mower,100-s.grass);s.grass+=cut;s.coins+=Math.max(1,Math.floor(cut/2));s.earned+=Math.max(1,Math.floor(cut/2));step++;let x=17+(step*13*(1+s.speed*.12))%65,y=54+((Math.floor(step/5)%3)*13);$('mower').style.left=x+'%';$('mower').style.top=y+'%';render();if(s.grass>=100)stop()},Math.max(280,760-s.speed*75))}
+function start(){if(s.grass>=100){s.grass=0;step=0}running=true;render();tick=setInterval(()=>{let cut=Math.min(1+s.mower*2,100-s.grass);s.grass+=cut;s.totalGrass+=cut;let payout=Math.max(1,Math.floor(cut*(1+0.25*(s.magnet-1))));s.coins+=payout;s.earned+=payout;s.xp+=cut;step++;let x=17+(step*13*(1+s.speed*.12))%65,y=54+((Math.floor(step/5)%3)*13);$('mower').style.left=x+'%';$('mower').style.top=y+'%';render();if(s.grass>=100){let bonus=s.basket*30;s.coins+=bonus;s.earned+=bonus;s.xp+=30;stop()}},Math.max(150,780-s.speed*125))}
 $('mowBtn').addEventListener('click',()=>running?stop():start());
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
-function show(tab){['meadow','quests','shop'].forEach(id=>$(id).hidden=id!==tab);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));}
+function show(tab){['meadow','quests','shop','extras'].forEach(id=>$(id).hidden=id!==tab);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));}
 $('questList').addEventListener('click',e=>{let b=e.target.closest('[data-claim]');if(!b)return;let i=+b.dataset.claim;if(!s.claimed[i]&&quests[i].progress()>=quests[i].goal){s.coins+=quests[i].reward;s.claimed[i]=true;render()}});
 $('shopList').addEventListener('click',e=>{let b=e.target.closest('[data-buy]');if(!b)return;let u=upgrades.find(x=>x.key===b.dataset.buy),cost=u.base*s[u.key];if(s.coins>=cost){s.coins-=cost;s[u.key]++;render()}});
+$('cosmetics').addEventListener('click',e=>{let b=e.target.closest('[data-outfit]');if(!b)return;let o=outfits.find(x=>x.emoji===b.dataset.outfit);if(s.owned.includes(o.emoji)){s.sheep=o.emoji}else if(s.coins>=o.cost){s.coins-=o.cost;s.owned.push(o.emoji);s.sheep=o.emoji}document.querySelector('.sheep').textContent=s.sheep;render()});
+document.querySelector('.sheep').textContent=s.sheep||'🐑';
 render();
 })();
 </script>
