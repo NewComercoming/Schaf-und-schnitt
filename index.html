@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eaf1df">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Schaf & Schnitt">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Schaf & Schnitt</title>
+<style>
+:root{--ink:#243b2b;--muted:#72806e;--green:#315d3d;--grass:#82b65d;--cream:#f5f4e9;--card:#fffefa;--gold:#f3bd4f}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#edf3e3,#f8f5e9);color:var(--ink);font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,sans-serif}
+.app{max-width:520px;margin:auto;padding:env(safe-area-inset-top) 16px calc(18px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 2px 14px}.eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:var(--muted)}h1{font-size:26px;line-height:1.1;margin:3px 0 0;font-weight:950;letter-spacing:-.7px}.wallet{background:#fff;border:1px solid #e8eadf;border-radius:99px;padding:10px 14px;font-weight:900;box-shadow:0 4px 14px #314a2810}
+.tabs{display:flex;gap:7px;background:#e4eadb;padding:5px;border-radius:18px;margin:0 0 13px}.tabs button{flex:1;border:0;border-radius:14px;padding:11px 4px;background:transparent;color:#687764;font-weight:800;font-size:12px}.tabs button.active{background:var(--green);color:white;box-shadow:0 3px 8px #23442d30}
+.card{background:var(--card);border:1px solid #e8eadf;border-radius:23px;padding:15px;box-shadow:0 8px 24px #34472b0b;margin-bottom:12px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.label{font-size:11px;font-weight:950;letter-spacing:1.3px;color:#75816d}.sub{font-size:12px;color:var(--muted);line-height:1.4}.meadow{height:260px;position:relative;overflow:hidden;border-radius:19px;margin-top:12px;background:#83b65f;border:1px solid #6da34c}
+.sky{height:35%;background:linear-gradient(#b9d9df,#dce8c7);position:absolute;inset:0 0 auto}.sun{position:absolute;right:24px;top:17px;font-size:25px}.cloud{position:absolute;left:24px;top:18px;font-size:24px}.hill{position:absolute;left:-10%;right:-10%;top:28%;height:25%;border-radius:50%;background:#9cc978}
+.grassgrid{position:absolute;inset:43% 0 0;background-color:#7daf50;background-image:linear-gradient(90deg,#75a94b 1px,transparent 1px),linear-gradient(#75a94b 1px,transparent 1px);background-size:22px 22px}
+.mowedpatch{position:absolute;inset:43% 0 0;background:repeating-linear-gradient(0deg,#b9cd78 0 11px,#a9c36b 11px 22px);clip-path:inset(0 100% 0 0);transition:clip-path .4s}
+.flowers{position:absolute;bottom:20px;left:12px;font-size:19px;letter-spacing:10px;opacity:.9}
+.tree{position:absolute;right:15px;bottom:22px;font-size:35px}
+.mower{position:absolute;left:17%;top:59%;width:105px;height:92px;transform:translate(-50%,-50%);transition:left .48s ease,top .48s ease;filter:drop-shadow(0 5px 3px #29401c55);z-index:3}
+.sheep{position:absolute;left:32px;top:0;font-size:44px;z-index:2;transform:rotate(-5deg)}.tractor{position:absolute;left:5px;top:37px;font-size:66px;line-height:1}
+.mowstatus{position:absolute;left:12px;bottom:10px;color:#fff;background:#294b2bd9;border-radius:99px;padding:7px 10px;font-size:9px;font-weight:950;letter-spacing:1px;z-index:4}
+.progressline{height:9px;background:#e9eddf;border-radius:99px;overflow:hidden;flex:1}.progressline span{display:block;height:100%;width:0;background:#5b994b;border-radius:99px;transition:width .3s}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}.stat{background:#fffefa;border:1px solid #e8eadf;border-radius:18px;text-align:center;padding:12px 5px}.stat b{display:block;font-size:17px}.stat small{font-size:10px;color:var(--muted);font-weight:700}
+.primary{width:100%;border:0;background:var(--green);color:#fff;border-radius:17px;padding:16px;font-weight:900;font-size:16px;box-shadow:0 5px 0 #24472f;margin-bottom:12px}.primary:active{transform:translateY(2px);box-shadow:0 3px 0 #24472f}
+.quest,.upgrade{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #edf0e7}.quest:last-child,.upgrade:last-child{border-bottom:0}.emoji{font-size:29px;width:42px;text-align:center}.grow{flex:1;min-width:0}.grow b{font-size:14px}.reward{font-size:12px;color:#b47a17;font-weight:900;white-space:nowrap}.tinybar{height:6px;background:#edf0e7;border-radius:99px;margin-top:7px;overflow:hidden}.tinybar span{display:block;height:100%;background:#77a957}
+.action{border:0;border-radius:99px;background:#e6efdf;color:#315d3d;padding:9px 12px;font-size:11px;font-weight:900}.action:disabled{opacity:.4}
+.paneltitle{font-size:22px;font-weight:950;margin:4px 0}.empty{padding:25px 10px;text-align:center;color:var(--muted)}
+footer{text-align:center;color:#8a9682;font-size:10px;padding:4px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><div><div class="eyebrow">DEINE KLEINE WIESENWELT</div><h1>Schaf & Schnitt 🐑</h1></div><div class="wallet">🪙 <span id="coins">125</span></div></header>
+<nav class="tabs" aria-label="Spielbereiche"><button class="active" data-tab="meadow">🌿 Wiese</button><button data-tab="quests">🏆 Quests</button><button data-tab="shop">🧰 Werkstatt</button></nav>
+<section id="meadow">
+<div class="card">
+<div class="row"><span class="label">DEINE WIESE</span><b id="percent" style="font-size:12px">0% gemäht</b></div>
+<div class="meadow" aria-label="Spielwiese mit einem Schaf auf einem Rasenmäher">
+<div class="sky"></div><div class="sun">☀️</div><div class="cloud">☁️</div><div class="hill"></div><div class="grassgrid"></div><div class="mowedpatch" id="patch"></div><div class="flowers">🌼 🌷</div><div class="tree">🌳</div>
+<div class="mower" id="mower"><div class="sheep">🐑</div><div class="tractor">🚜</div></div>
+<div class="mowstatus" id="status">FLOCKE IST BEREIT</div>
+</div>
+<div class="row" style="margin-top:13px"><span>✂️</span><div class="progressline"><span id="bar"></span></div><b id="remaining" style="font-size:11px">100% übrig</b></div>
+</div>
+<div class="stats"><div class="stat"><b id="mowed">0%</b><small>Gemäht</small></div><div class="stat"><b id="mowerLevel">1</b><small>Mäher-Level</small></div><div class="stat"><b id="speedLevel">1</b><small>Tempo-Level</small></div></div>
+<button class="primary" id="mowBtn">▶ Los geht's, Flocke!</button>
+<div class="card"><div class="row"><span class="label">KLEINE AUFGABE</span><button class="action" data-goto="quests">Alle ansehen →</button></div><div class="quest"><div class="emoji">🌼</div><div class="grow"><b>Erste Bahnen</b><div class="sub">Mähe 20 % der Wiese</div></div><span class="reward">+45 🪙</span></div></div>
+</section>
+<section id="quests" hidden>
+<div class="card"><div class="paneltitle">Deine Quests 🏆</div><div class="sub">Jede gemähte Bahn bringt Flocke näher ans Ziel.</div><div id="questList"></div></div>
+</section>
+<section id="shop" hidden>
+<div class="card"><div class="paneltitle">Flockes Werkstatt 🧰</div><div class="sub">Investiere deine Mäh-Münzen in bessere Ausrüstung.</div><div id="shopList"></div></div>
+</section>
+<footer>Ein kleines Spiel für dich und Flocke · Spielstand bleibt auf diesem Gerät gespeichert</footer>
+</main>
+<script>
+(()=>{
+const defaults={coins:125,grass:0,mower:1,speed:1,basket:1,earned:0,claimed:[false,false,false]};
+let s;try{s={...defaults,...JSON.parse(localStorage.getItem('sheep-cut-save')||'{}')}}catch{s={...defaults}}
+let running=false,tick=null,step=0;
+const $=id=>document.getElementById(id);
+const quests=[{icon:'🌼',name:'Erste Bahnen',desc:'Mähe 20 % der Wiese',goal:20,reward:45,progress:()=>s.grass},{icon:'🐑',name:'Fleißiges Schäfchen',desc:'Mähe 50 % der Wiese',goal:50,reward:90,progress:()=>s.grass},{icon:'🪙',name:'Münzsammler',desc:'Verdiene 100 Münzen',goal:100,reward:60,progress:()=>s.earned}];
+const upgrades=[{key:'mower',icon:'⚙️',name:'Turbo-Messer',desc:'Mehr Gras pro Mährunde',base:80},{key:'speed',icon:'💨',name:'Flitz-Reifen',desc:'Flocke fährt flotter umher',base:65},{key:'basket',icon:'🧺',name:'Großer Fangkorb',desc:'Mehr Platz für deine Ernte',base:55}];
+function save(){localStorage.setItem('sheep-cut-save',JSON.stringify(s))}
+function render(){
+$('coins').textContent=s.coins;$('percent').textContent=s.grass+'% gemäht';$('mowed').textContent=s.grass+'%';$('mowerLevel').textContent=s.mower;$('speedLevel').textContent=s.speed;$('remaining').textContent=(100-s.grass)+'% übrig';$('bar').style.width=s.grass+'%';$('patch').style.clipPath=`inset(0 ${100-s.grass}% 0 0)`;
+$('questList').innerHTML=quests.map((q,i)=>{let p=Math.min(q.progress(),q.goal),done=p>=q.goal;return `<div class="quest"><div class="emoji">${q.icon}</div><div class="grow"><b>${q.name}</b><div class="sub">${q.desc}</div><div class="tinybar"><span style="width:${p/q.goal*100}%"></span></div><div class="sub">${p} / ${q.goal}</div></div><div style="text-align:right"><div class="reward">+${q.reward} 🪙</div><button class="action" data-claim="${i}" ${!done||s.claimed[i]?'disabled':''}>${s.claimed[i]?'Erledigt ✓':'Abholen'}</button></div></div>`}).join('');
+$('shopList').innerHTML=upgrades.map(u=>{let level=s[u.key],cost=u.base*level;return `<div class="upgrade"><div class="emoji">${u.icon}</div><div class="grow"><b>${u.name}</b><div class="sub">${u.desc}</div><div class="sub">Level ${level}</div></div><button class="action" data-buy="${u.key}" ${s.coins<cost?'disabled':''}>🪙 ${cost}</button></div>`}).join('');
+$('mowBtn').textContent=running?'Ⅱ Pause machen':(s.grass>=100?'↻ Neue Wiese':'▶ Los geht’s, Flocke!');$('status').textContent=running?'FLOCKE MÄHT FLEISSIG':(s.grass>=100?'WIESE PERFEKT!':'FLOCKE IST BEREIT');
+save();
+}
+function stop(){running=false;clearInterval(tick);tick=null;render()}
+function start(){if(s.grass>=100){s.grass=0;step=0}running=true;render();tick=setInterval(()=>{let cut=Math.min(1+s.mower,100-s.grass);s.grass+=cut;s.coins+=Math.max(1,Math.floor(cut/2));s.earned+=Math.max(1,Math.floor(cut/2));step++;let x=17+(step*13*(1+s.speed*.12))%65,y=54+((Math.floor(step/5)%3)*13);$('mower').style.left=x+'%';$('mower').style.top=y+'%';render();if(s.grass>=100)stop()},Math.max(280,760-s.speed*75))}
+$('mowBtn').addEventListener('click',()=>running?stop():start());
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.goto)));
+function show(tab){['meadow','quests','shop'].forEach(id=>$(id).hidden=id!==tab);document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));}
+$('questList').addEventListener('click',e=>{let b=e.target.closest('[data-claim]');if(!b)return;let i=+b.dataset.claim;if(!s.claimed[i]&&quests[i].progress()>=quests[i].goal){s.coins+=quests[i].reward;s.claimed[i]=true;render()}});
+$('shopList').addEventListener('click',e=>{let b=e.target.closest('[data-buy]');if(!b)return;let u=upgrades.find(x=>x.key===b.dataset.buy),cost=u.base*s[u.key];if(s.coins>=cost){s.coins-=cost;s[u.key]++;render()}});
+render();
+})();
+</script>
+<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>
+</body></html>
